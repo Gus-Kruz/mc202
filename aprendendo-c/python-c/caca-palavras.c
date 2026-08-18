@@ -61,14 +61,14 @@ void marcar_ocorrencia_horizontal(char palavra[],
     int tamanho = strlen(palavra);
     bool igual = true;
     if (j + tamanho <= n) {
-        for (int k = j; k < tamanho + j; k++) {
-            if (A[i][k] != palavra[k-j]) {
+        for (int k = 0; k < tamanho; k++) {
+            if (A[i][j+k] != palavra[k]) {
                 igual = false;
             }
         }
         if (igual) {
-            for (int l = j; l < j + tamanho; l++) {
-                B[i][l] = palavra[l-j];
+            for (int l = 0; l < tamanho; l++) {
+                B[i][j+l] = palavra[l];
             }
         }
     }
@@ -80,15 +80,15 @@ void marcar_ocorrencia_vertical(char palavra[],
 {   
     int tamanho = strlen(palavra);
     bool igual = true;
-    if (j + tamanho <= n) {
-        for (int k = j; k < tamanho + j; k++) {
-            if (A[i][k] != palavra[k-j]) {
+    if (i + tamanho <= m) {
+        for (int k = 0; k < tamanho; k++) {
+            if (A[i+k][j] != palavra[k]) {
                 igual = false;
             }
         }
         if (igual) {
-            for (int l = j; l < j + tamanho; l++) {
-                B[i][l] = palavra[l-j];
+            for (int l = 0; l < tamanho; l++) {
+                B[i+l][j] = palavra[l];
             }
         }
     }
@@ -100,14 +100,31 @@ void marcar_ocorrencia_diagonal(char palavra[],
         int m, int n, int i, int j)
 {
     int tamanho = strlen(palavra);
+    bool igual = true;
     if (i + tamanho <= m && j + tamanho <= n) {
         for (int k = 0; k < tamanho; k++) {
-            if (A[i+k][j+k] == palavra[k]) {
-                B[i+k][j+k] = palavra[k];
-            } else {
-                break;
+            if (A[i+k][j+k] != palavra[k]) {
+                igual = false;
             }
         }
+        if (igual) {
+            for (int l = 0; l < tamanho; l++) {
+                B[i+l][j+l] = palavra[l];
+            }
+        }
+    }
+    igual = true;
+    if (i - tamanho + 1 >= 0 && j + tamanho <= n) {
+        for (int k = 0; k < tamanho; k++) {
+            if (A[i-k][j+k] != palavra[k]) {
+                igual = false;
+            }
+        }
+        if (igual) {
+            for (int l = 0; l < tamanho; l++) {
+                B[i-l][j+l] = palavra[l];
+            }
+        } 
     }
 }
 
