@@ -1,0 +1,4 @@
+recebe a frase
+para cada palavra na frase
+aplica cada regra e substitiui na frase
+imprime a frase modificada
