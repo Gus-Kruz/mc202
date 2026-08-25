@@ -77,15 +77,16 @@ int regra_quatro(char palavra[], int tamanho, int *soma) {
             char str_numero[100];
 
             j = i;
-            while (j < tamanho && isdigit((unsigned char)palavra[j])) {
+            while (j < tamanho && isdigit(palavra[j])) {
                 str_numero[j - i] = palavra[j];
                 j++;
             }
 
             str_numero[j - i] = '\0';
             *soma = atoi(str_numero);
+	    j--;
 
-            tamanho = apagar_parte(palavra, i, j--, tamanho);
+            tamanho = apagar_parte(palavra, i, j, tamanho);
 
             continue;
 
@@ -94,7 +95,8 @@ int regra_quatro(char palavra[], int tamanho, int *soma) {
             while (j < tamanho && ispunct(palavra[j])) {
                 j++;
             }
-            tamanho = apagar_parte(palavra, i, j--, tamanho);
+	    j--;
+            tamanho = apagar_parte(palavra, i, j, tamanho);
 
             continue;
         }
