@@ -146,10 +146,11 @@ int main() {
     while (scanf("%s", palavra_atual) == 1) {
         int tamanho_palavra = strlen(palavra_atual);
         soma = aplicar_regras(palavra_atual, soma, &tamanho_palavra);
+
         if (tamanho_palavra > 0) {
             tamanho_frase = adicionar_palavra(frase, palavra_atual, tamanho_frase, tamanho_palavra);
         }
-        
+
         while ((c = getchar()) != EOF) {
             if (c == '\n') {
                 linha_acabou = true;
@@ -174,17 +175,16 @@ int main() {
             tamanho_frase = 0;
         }
     }
-    
-    // caso que não tem quebra de linha no final do arquivo
-    if (i > 0) {  
-        if (soma == 1) {
-            printf("1 goat says: ");
-        } else {
-            printf("%d goats say: ", soma);
-        }
 
-        printf("%s\n", frase);
+
+    if (soma == 1) {
+        printf("1 goat says: ");
+    } else {
+        printf("%d goats say: ", soma);
     }
+    frase[tamanho_frase] = '\0';
+    printf("%s\n", frase);
+
 
     return 0;
 }
