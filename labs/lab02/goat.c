@@ -132,7 +132,7 @@ int main() {
         soma = aplicar_regras(frase[i], soma);
         i++;
         
-        while ((c = getchar()) == 1) {
+        while ((c = getchar()) != EOF) {
             if (c == '\n') {
                 linha_acabou = true;
                 break;
