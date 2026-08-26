@@ -51,7 +51,7 @@ int regra_tres(char palavra[], int tamanho_0, int tamanho) {
     }
     palavra[tamanho + tamanho_0] = '\0';
 
-    return tamanho *= 2;
+    return tamanho + tamanho_0;
 
 }
 
