@@ -73,8 +73,8 @@ int regra_quatro(char palavra[], int tamanho, int *soma) {
     int i = 0;
     int j = 0;
     while (i < tamanho) {
-        if (isdigit(palavra[i]) && palavra[0]!= '\0') {
-            char str_numero[100];
+        if (isdigit(palavra[i])) {
+            char str_numero[15];
 
             j = i;
             while (j < tamanho && isdigit(palavra[j])) {
@@ -83,14 +83,14 @@ int regra_quatro(char palavra[], int tamanho, int *soma) {
             }
 
             str_numero[j - i] = '\0';
-            *soma = atoi(str_numero);
+            *soma += atoi(str_numero);
             j--;
 
             tamanho = apagar_parte(palavra, i, j, tamanho);
 
             continue;
 
-        } else if (ispunct(palavra[i]) && palavra[0] != '\0') {
+        } else if (ispunct(palavra[i])) {
             j = i;
             while (j < tamanho && ispunct(palavra[j])) {
                 j++;
@@ -125,26 +125,57 @@ int main() {
     char frase[10000][100];
     int i = 0;
     int soma = 0;
-    int tamanho = 0;
-    while (true) {
-        if (scanf("%s", frase[i]) != EOF) {
-        tamanho = strlen(frase[i]);
+    char c;
+    bool linha_acabou = false;
+    
+    while (scanf("%s", frase[i]) == 1) {
         soma = aplicar_regras(frase[i], soma);
-            i++;
+        i++;
+        
+        while ((c = getchar()) == 1) {
+            if (c == '\n') {
+                linha_acabou = true;
+                break;
+            } else if (!isspace(c)) {
+                ungetc(c, stdin);
+                break;
+            }
         }
-        else {
-            break;
+        
+        if (linha_acabou) {
+            if (soma == 1) {
+                printf("1 goat says:");
+            } else {
+                printf("%d goats say:", soma);
+            }
+
+            for (int j = 0; j < i; j++) {
+                if (frase[j][0] != '\0') {
+                    printf(" %s", frase[j]);
+                }
+            }
+            printf("\n");
+            
+            i = 0;
+            soma = 0;
+            linha_acabou = false;
         }
     }
-    if (soma == 1) {
-        printf("1 goat says: ");
-    } else {
-        printf("%d goats says: ", soma);
-    }
-    for (int j = 0; j < i; j++) {
-        if (frase[j][0] != '\0') {
-            printf("%s ", frase[j]);
+    
+    // caso que não tem quebra de linha no final do arquivo
+    if (i > 0) {  
+        if (soma == 1) {
+            printf("1 goat says:");
+        } else {
+            printf("%d goats say:", soma);
         }
+
+        for (int j = 0; j < i; j++) {
+            if (frase[j][0] != '\0') {
+                printf(" %s", frase[j]);
+            }
+        }
+        printf("\n");
     }
 
     return 0;
