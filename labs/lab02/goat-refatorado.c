@@ -134,10 +134,32 @@ int adicionar_palavra(char frase[], char palavra[], int tamanho_frase, int taman
     return tamanho_frase;
 }
 
+void imprimir_frase(char frase[], int soma, int tamanho_frase) {
+    if (tamanho_frase > 0) {
+        if (soma == 1) {
+            printf("1 goat says: ");
+        } else {
+            printf("%d goats say: ", soma);
+        }
+    } else {
+        if (soma == 1) {
+            printf("1 goat says:");
+        } else {
+            printf("%d goats say:", soma);
+        }
+    }
+    if (tamanho_frase == 0) {
+        frase[tamanho_frase] = '\0';
+    } else {
+        frase[tamanho_frase-1] = '\0';
+    }
+
+    printf("%s\n", frase);
+}
+
 int main() {
-    char frase[200000];
+    char *frase = (char*)malloc(4000000 * sizeof(char));
     char palavra_atual[100];
-    int i = 0;
     int soma = 0;
     char c;
     bool linha_acabou = false;
@@ -152,7 +174,7 @@ int main() {
         }
 
         while ((c = getchar()) != EOF) {
-            if (c == '\n') {
+            if (c == '\n' ) {
                 linha_acabou = true;
                 break;
             } else if (!isspace(c)) {
@@ -162,29 +184,20 @@ int main() {
         }
 
         if (linha_acabou) {
-            if (soma == 1) {
-                printf("1 goat says: ");
-            } else {
-                printf("%d goats say: ", soma);
-            }
-            frase[tamanho_frase-2] = '\0';
-            printf("%s\n", frase);
+            imprimir_frase(frase, soma, tamanho_frase);
 
             soma = 0;
             linha_acabou = false;
             tamanho_frase = 0;
+            frase[0] = '\0';
         }
     }
 
-
-    if (soma == 1) {
-        printf("1 goat says: ");
-    } else {
-        printf("%d goats say: ", soma);
+    if (tamanho_frase > 0 || soma > 0) {
+        imprimir_frase(frase, soma, tamanho_frase);
     }
-    frase[tamanho_frase-2] = '\0';
-    printf("%s", frase);
 
+    free(frase);
 
     return 0;
 }
