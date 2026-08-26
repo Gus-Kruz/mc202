@@ -167,7 +167,7 @@ int main() {
             } else {
                 printf("%d goats say: ", soma);
             }
-            frase[tamanho_frase] = '\0';
+            frase[tamanho_frase-2] = '\0';
             printf("%s\n", frase);
 
             soma = 0;
@@ -182,8 +182,8 @@ int main() {
     } else {
         printf("%d goats say: ", soma);
     }
-    frase[tamanho_frase] = '\0';
-    printf("%s\n", frase);
+    frase[tamanho_frase-2] = '\0';
+    printf("%s", frase);
 
 
     return 0;
