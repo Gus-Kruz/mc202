@@ -31,7 +31,7 @@ void leftshift_array(char array[], int tamanho) {
 }
 
 int regra_dois(char palavra[], int tamanho) {
-    if (!(palavra[0] == 'a' || palavra[0] == 'A'  // note a negação
+    if (!(palavra[0] == 'a' || palavra[0] == 'A'
     || palavra[0] == 'e' || palavra[0] == 'E'
     || palavra[0] == 'i' || palavra[0] == 'I'
     || palavra[0] == 'o' || palavra[0] == 'O'
@@ -45,84 +45,59 @@ int regra_dois(char palavra[], int tamanho) {
     return tamanho;
 }
 
-int regra_tres(char palavra[], int tamanho_0, int tamanho) {
-    for (int i = 0; i < tamanho_0; i++) {
+int regra_tres(char palavra[], int tamanho_original, int tamanho) {
+    for (int i = 0; i < tamanho_original; i++) {
         palavra[tamanho + i] = 'a';
     }
-    palavra[tamanho + tamanho_0] = '\0';
+    palavra[tamanho + tamanho_original] = '\0';
 
     return tamanho *= 2;
 
 }
 
-int apagar_parte(char palavra[], int i, int j, int tamanho) {
-    int tamanho_apagar = (j - i) + 1;
+void apagar_parte(char palavra[], int i, int j) {
+    int tamanho = (j - i) + 1;
 
-    for (int k = 0; k < tamanho - (j + 1); k++) {
-        palavra[i+k] = palavra[j+1+k];
+    for (int k = 0; k < tamanho; k++) {
+        palavra[i+k] = palavra[j+k+1];
     }
-    
-    tamanho -= tamanho_apagar;
-
-    palavra[tamanho] = '\0';
-
-    return tamanho;
 }
 
-int regra_quatro(char palavra[], int tamanho, int *soma) {
+int regra_quatro(char palavra[], int tamanho, int soma) {
     int i = 0;
     int j = 0;
     while (i < tamanho) {
-        if (isdigit(palavra[i]) && palavra[0]!= '\0') {
+        if (isdigit(palavra[i])) {
             char str_numero[100];
-
-            j = i;
+            int numero = 0;
+            i = j;
             while (j < tamanho && isdigit(palavra[j])) {
-                str_numero[j - i] = palavra[j];
+                str_numero[j-i] = palavra[j];
                 j++;
             }
-
-            str_numero[j - i] = '\0';
-            *soma = atoi(str_numero);
-            j--;
-
-            tamanho = apagar_parte(palavra, i, j, tamanho);
-
-            continue;
-
-        } else if (ispunct(palavra[i]) && palavra[0] != '\0') {
-            j = i;
-            while (j < tamanho && ispunct(palavra[j])) {
-                j++;
-            }
-            j--;
-            tamanho = apagar_parte(palavra, i, j, tamanho);
-
-            continue;
+            apagar_parte(palavra, i, j);
+            numero = atoi(str_numero);
+            soma += numero;
         }
         i++;
     }
 
-    return tamanho;
+    return soma;
 }
 
 int aplicar_regras(char palavra[], int soma) {
-    int tamanho_0 = strlen(palavra);
-    tamanho_0 = regra_quatro(palavra, tamanho_0, &soma);
-    int tamanho = tamanho_0;
-    if (tamanho == 0) { // otimização caso apague
-        return soma;
-    }
-
+    int tamanho_original = strlen(palavra);
+    int tamanho = tamanho_original;
+    soma = regra_quatro(palavra, tamanho, soma);
     tamanho = regra_um(palavra, tamanho);
     tamanho = regra_dois(palavra, tamanho);
-    tamanho = regra_tres(palavra, tamanho_0, tamanho);
+    tamanho = regra_tres(palavra, tamanho_original, tamanho);
     
     return soma;
 }
 
 int main() {
-    char frase[10000][100];
+    char frase[10000];
     int i = 0;
     int soma = 0;
     int tamanho = 0;
