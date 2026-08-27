@@ -158,7 +158,7 @@ void imprimir_frase(char frase[], int soma, int tamanho_frase) {
 }
 
 int main() {
-    char *frase = (char*)malloc(4000000 * sizeof(char));
+    char frase[250000];
     char palavra_atual[100];
     int soma = 0;
     char c;
@@ -196,8 +196,6 @@ int main() {
     if (tamanho_frase > 0 || soma > 0) {
         imprimir_frase(frase, soma, tamanho_frase);
     }
-
-    free(frase);
 
     return 0;
 }
