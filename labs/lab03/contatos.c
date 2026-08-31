@@ -5,8 +5,8 @@
 
 typedef struct {
     char nome[51];
-    char endereco[101];
-    char telefone[16];
+    char endereco[120];
+    char telefone[25];
     char aniversario[9];
 } contato;
 
@@ -55,17 +55,17 @@ void buscar_contato(contato lista_contatos[], int *tamanho_lista) {
     printf("Resultado da busca:\n");
 
     for (int i = 0; i < *tamanho_lista; i++) {
-        if (strcmp(nome_buscar, lista_contatos[i].nome) == 0) { 
-            printf("(%d) %s	%s	%s	%s\n", (i+1), lista_contatos[i].nome, lista_contatos[i].endereco, lista_contatos[i].telefone, lista_contatos[i].aniversario);
+        if (strstr(lista_contatos[i].nome, nome_buscar) != NULL) {
+            printf("(%d) %s\t%s\t%s\t%s\n", (i+1), lista_contatos[i].nome, lista_contatos[i].endereco, lista_contatos[i].telefone, lista_contatos[i].aniversario);
+            printf("\n");
             encontrou = true;
         }
     }
 
     if (!encontrou) {
         printf("Nenhum contato.\n");
+        printf("\n");
     }
-
-    printf("\n");
 }
 
 void imprimir_contatos(contato lista_contatos[], int *tamanho_lista) {
@@ -74,7 +74,7 @@ void imprimir_contatos(contato lista_contatos[], int *tamanho_lista) {
 
     if (*tamanho_lista > 0) {
         for (int i = 0; i < *tamanho_lista; i++) {
-            printf("(%d) %s	%s	%s	%s\n", (i+1), lista_contatos[i].nome, lista_contatos[i].endereco, lista_contatos[i].telefone, lista_contatos[i].aniversario);
+            printf("(%d) %s\t%s\t%s\t%s\n", (i+1), lista_contatos[i].nome, lista_contatos[i].endereco, lista_contatos[i].telefone, lista_contatos[i].aniversario);
         }
     } else {
         printf("Nenhum contato.\n");
@@ -89,7 +89,7 @@ void finalizar_programa() {
 
 int main() {
     char operador;
-    contato lista_contatos[1000];
+    contato lista_contatos[10000];
     int tamanho_lista = 0;
 
     while (true) {  // programa finaliza no caso f 
