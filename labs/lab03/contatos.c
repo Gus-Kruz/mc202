@@ -41,7 +41,7 @@ void remover_contato(contato lista_contatos[], int *tamanho_lista) {
         }
     }
 
-    printf("Contatos de %s removidos: %d\n", nome_remover, removidos);
+    printf("Contatos de %s removidos: %d.\n", nome_remover, removidos);
     printf("\n");
 }
 
