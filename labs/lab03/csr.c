@@ -26,13 +26,29 @@ void montar_csr_1(int k, int *A, int *C, coordenada *VC) {
     }
 }
 
-void montar_csr_2(int k, coordenada *VC, int *R) {
-    int n_R = VC[k-1].i + 1;
-    int n_elementos = 0;
+void montar_csr(int k, int *A, int *C, coordenada *VC, int *R) {
+    int n_linhas = VC[k-1].i + 1;
     int index_lista = 0;
-    for (int l = 0; l < n_R; l++) {
-        if (VC[index_lista].i >= l) {
-            
+
+    for (int l = 0; l <= n_linhas; l++) {
+        while (index_lista < k) {
+            A[index_lista] = VC[index_lista].x;
+            C[index_lista] = VC[index_lista].j;
+            if (VC[index_lista].i < l) {
+                index_lista++;
+            } else {
+                R[l] = index_lista;
+                if (VC[index_lista].i == l) {
+                    index_lista++;
+                    break;
+                } else {
+                    R[l+1] = index_lista;
+                    break;
+                }
+            }
+        }
+        if (index_lista == k) {
+            R[l] = index_lista;
         }
     }
 }
@@ -51,9 +67,15 @@ int main() {
 
     qsort(VC, k, sizeof(coordenada), compare_coordenadas);
 
-    int *R = (int *) malloc((VC[k-1].i + 1) * sizeof(int));
+    printf("Vetor VC: ");
+    for (int l = 0; l < k; l++) {
+        printf("%d ", VC[l].i);
+    }
+    printf("\n");
 
-    montar_csr_1(k, A, C, VC);
+    int *R = (int *) malloc((VC[k-1].i + 2) * sizeof(int));
+
+    montar_csr(k, A, C, VC, R);
 
     printf("Vetor A: ");
     for (int l = 0; l < k; l++) {
@@ -67,10 +89,8 @@ int main() {
     }
     printf("\n");
 
-    montar_csr_2(k, VC, R);
-
     printf("Vetor R: ");
-    for (int l = 0; l < (VC[k-1].i + 1); l++) {
+    for (int l = 0; l < (VC[k-1].i + 2); l++) {
         printf("%d ", R[l]);
     }
     printf("\n");
