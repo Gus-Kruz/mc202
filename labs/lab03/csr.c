@@ -20,50 +20,28 @@ int compare_coordenadas(const void *a, const void *b) {
 }
 
 void montar_csr(int *A, int *C, coordenada *VC, int *R, int k, int n_linhas) {
-    int index_lista = 0;
+    for (int i = 0; i < k; i++) {
+        A[i] = VC[i].x;
+        C[i] = VC[i].j;
+        R[VC[i].i + 1]++;
+    }
 
-    for (int l = 0; l <= n_linhas; l++) {
-        while (index_lista < k) {
-            A[index_lista] = VC[index_lista].x;
-            C[index_lista] = VC[index_lista].j;
-            if (VC[index_lista].i < l) {
-                index_lista++;
-            } else {
-                R[l] = index_lista;
-                if (VC[index_lista].i == l) {
-                    index_lista++;
-                    break;
-                } else {
-                    R[l+1] = index_lista;
-                    break;
-                }
-            }
-        }
-        if (index_lista == k) {
-            R[l] = index_lista;
-        }
+    for (int l = 0; l < n_linhas; l++) {
+        R[l + 1] += R[l];
     }
 }
 
 int buscar_elemento(int *R, int *A, int *C, int n_linhas, int i_busca, int j_busca) {
-    bool encontrou_j = false;
-    int posicao;
-
-    if (i_busca > n_linhas || R[i_busca] == R[i_busca + 1]) {
+    if (i_busca >= n_linhas || R[i_busca] == R[i_busca + 1]) {
         return 0;
     } else {
         for (int k = R[i_busca]; k < R[i_busca+1]; k++) {
             if (j_busca == C[k]) {
-                encontrou_j = true;
-                posicao = k;
-                break;
+                return A[k];
             }
         }
-        if (encontrou_j) {
-            return A[posicao];
-        } else {
-            return 0;
-        }
+
+    return 0;
     }
 }
 
@@ -83,7 +61,7 @@ int main() {
 
     int n_linhas = VC[k-1].i + 1;
 
-    int *R = (int *) malloc((VC[k-1].i + 2) * sizeof(int));
+    int *R = (int *) calloc((VC[k-1].i + 2), sizeof(int));
 
     montar_csr(A, C, VC, R, k, n_linhas);
 
@@ -92,9 +70,6 @@ int main() {
     while (true) {
         scanf(" %d %d", &i_busca, &j_busca);
         if (i_busca == -1 && j_busca == -1) {
-            free(A);
-            free(C);
-            free(R);
             exit(EXIT_SUCCESS);
         } else {
             valor_encontrado = buscar_elemento(R, A, C, n_linhas, i_busca, j_busca);
