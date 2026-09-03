@@ -3,17 +3,21 @@
 
 typedef struct {
     int n_inversoes;
+    int pos_original;
     char *sequencia;
 } cadeia;
 
 int medir_inversoes(char *sequencia, int j) {
     int n_inversoes = 0;
-    for (int i = 0; i < j-1; i++) {
-        int distancia = sequencia[i] - sequencia[i+1];
-        if (distancia > 0) {
-            n_inversoes += distancia;
+
+    for (int i = 0; i < j - 1; i++) {
+        for (int k = i + 1; k < j; k++) {
+            if (sequencia[i] > sequencia[k]) {
+                n_inversoes++;
+            }
         }
     }
+
     return n_inversoes;
 }
 
@@ -21,7 +25,11 @@ int compare_cadeias(const void *a, const void *b) {
     const cadeia *c1 = (const cadeia *) a;
     const cadeia *c2 = (const cadeia *) b;
 
-    return (c1->n_inversoes - c2->n_inversoes);
+    if (c1->n_inversoes != c2->n_inversoes) {
+        return (c1->n_inversoes - c2->n_inversoes);
+    } else {
+        return (c1->pos_original - c2->pos_original);
+    }
 }
 
 int main() {
@@ -35,10 +43,11 @@ int main() {
 
         cadeia *DNAS = (cadeia *) malloc(k * sizeof(cadeia));
 
-        for (int i =0; i < k; i++) {
-            DNAS[i].sequencia = (char *) malloc(j * sizeof(char));
+        for (int i = 0; i < k; i++) {
+            DNAS[i].sequencia = (char *) malloc((j+1) * sizeof(char));
 
             scanf(" %s", DNAS[i].sequencia);
+            DNAS[i].pos_original = i;
             DNAS[i].n_inversoes = medir_inversoes(DNAS[i].sequencia, j);
         }
 
