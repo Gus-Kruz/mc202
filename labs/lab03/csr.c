@@ -23,7 +23,7 @@ void montar_csr(int *A, int *C, coordenada *VC, int *R, int k, int n_linhas) {
     int index_lista = 0;
 
     for (int l = 0; l <= n_linhas; l++) {
-        while (index_lista <= k) {
+        while (index_lista < k) {
             A[index_lista] = VC[index_lista].x;
             C[index_lista] = VC[index_lista].j;
             if (VC[index_lista].i < l) {
@@ -39,7 +39,7 @@ void montar_csr(int *A, int *C, coordenada *VC, int *R, int k, int n_linhas) {
                 }
             }
         }
-        if (index_lista == k+1) {
+        if (index_lista == k) {
             R[l] = index_lista;
         }
     }
@@ -73,7 +73,7 @@ int main() {
     scanf("%d", &k);
     int *A = (int *) malloc(k * sizeof(int));
     int *C = (int *) malloc(k * sizeof(int));
-    coordenada *VC = malloc(k * sizeof(coordenada));
+    coordenada *VC = (coordenada *) malloc(k * sizeof(coordenada));
 
     for (int l = 0; l < k; l++) {
         scanf(" %d %d %d", &VC[l].i, &VC[l].j, &VC[l].x);
