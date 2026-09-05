@@ -8,13 +8,25 @@ typedef struct {
 } cadeia;
 
 int medir_inversoes(char *sequencia, int j) {
+    int n_ocorr[4] = {0,0,0,0}; // n_ocorr = [n_A, n_C, n_G, n_T]
     int n_inversoes = 0;
 
-    for (int i = 0; i < j - 1; i++) {
-        for (int k = i + 1; k < j; k++) {
-            if (sequencia[i] > sequencia[k]) {
-                n_inversoes++;
-            }
+    for (int i = j-1 ; i >= 0; i--) {
+        switch (sequencia[i]) {
+        case 'T':
+            n_inversoes += n_ocorr[0] + n_ocorr[1] + n_ocorr[2];
+            n_ocorr[3]++;
+            break;
+        case 'G':
+            n_inversoes += n_ocorr[0] + n_ocorr[1];
+            n_ocorr[2]++;
+            break;
+        case 'C':
+            n_inversoes += n_ocorr[0];
+            n_ocorr[1]++;
+            break;
+        case 'A':
+            n_ocorr[0]++;
         }
     }
 
