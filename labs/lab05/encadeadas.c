@@ -226,3 +226,5 @@ int main() {
                 limpar_vetor(vetor_conjuntos);
                 return 0;
         }
+    }
+}
