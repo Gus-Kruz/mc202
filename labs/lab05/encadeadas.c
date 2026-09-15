@@ -141,7 +141,7 @@ void conjunto_intersecao(conjunto* c_i, conjunto* c_j, conjunto* c_k) {
 }
 
 void limpar_vetor(conjunto vetor_conjuntos[]) {
-    for (int i = 0; i < 129; i++) {
+    for (int i = 0; i < 128; i++) {
         conjunto c = vetor_conjuntos[i];
         while(c.head != NULL) {
             no_elemento* p = c.head;
@@ -160,9 +160,9 @@ int main() {
     int n_elementos;
     int valor_elemento;
 
-    conjunto* vetor_conjuntos = malloc(130 * sizeof(conjunto));
+    conjunto* vetor_conjuntos = malloc(128 * sizeof(conjunto));
 
-    for (int i = 1; i < 129; i++) {
+    for (int i = 0; i < 128; i++) {
         vetor_conjuntos[i].tamanho = 0;
         vetor_conjuntos[i].head = NULL;
     }
@@ -226,9 +226,3 @@ int main() {
                 limpar_vetor(vetor_conjuntos);
                 return 0;
         }
-
-    }
-    if (vetor_conjuntos[1].head == NULL) {
-        printf("tá inicializando!");
-    }
-}
