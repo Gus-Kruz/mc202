@@ -13,25 +13,20 @@ typedef struct conjunto {
 } conjunto;
 
 void inicializar_conjunto(conjunto* c) {
-    while(c->head != NULL) {
-        no_elemento* p = c->head;
-        c->head = c->head->prox;
-        free(p);
+    if (c == NULL) return;
+    no_elemento* p = c->head;
+
+    while(p != NULL) {
+        no_elemento* aux = p;
+        p = p->prox;
+        free(aux);
     }
-    c->tamanho = 0;
+
     c->head = NULL;
+    c->tamanho = 0;
 }
 
 void adicionar_elemento(conjunto* c, int valor_novo_elemento) {
-    no_elemento* p = c->head;
-    
-    while(p != NULL) {
-        if (p->valor_elemento == valor_novo_elemento) {
-            return;
-        }
-        p = p->prox;
-    }
-
     no_elemento* novo_elemento = malloc(sizeof(no_elemento));
     if (novo_elemento == NULL) {
         return;
@@ -42,15 +37,48 @@ void adicionar_elemento(conjunto* c, int valor_novo_elemento) {
 
     if (c->head == NULL) {
         c->head = novo_elemento;
-    } else {
-        p = c->head;
-        while (p->prox != NULL) {
-            p = p->prox;
-        }
-        p->prox = novo_elemento;
+        c->tamanho = 1;
+        return;
     }
 
-    c->tamanho++;
+    no_elemento* p = c->head;
+
+    // caso que insere no início
+
+    if (p->valor_elemento > valor_novo_elemento) {
+        c->head = novo_elemento;
+        novo_elemento->prox = p;
+        c->tamanho++;
+        return;
+    }
+
+    // caso que o primeiro elemento é igual
+    if (p->valor_elemento == valor_novo_elemento) {
+        free(novo_elemento);
+        return;
+    }
+
+    // percorre a lista até econtrar o final ou encontrar um número menor que ele
+
+    while(p->valor_elemento < valor_novo_elemento) {
+        no_elemento* p_anterior = p;
+        // caso que chega no final da lista
+        if (p->prox == NULL) {
+            p->prox = novo_elemento;
+            c->tamanho++;
+            return;
+        }
+        p = p->prox;
+        if (p->valor_elemento == valor_novo_elemento) {
+            free(novo_elemento);
+            return;
+        } else if (p->valor_elemento > valor_novo_elemento) {
+            p_anterior->prox = novo_elemento;
+            novo_elemento->prox = p;
+            c->tamanho++;
+            return;
+        }
+    }
 }
 
 void remover_elemento(conjunto* c, int valor_elemento_rem) {
@@ -140,16 +168,28 @@ void conjunto_intersecao(conjunto* c_i, conjunto* c_j, conjunto* c_k) {
     c_i->tamanho = temp.tamanho;
 }
 
+void imprimir_elementos(conjunto* c, int i_conjunto) {
+    no_elemento* p = c->head;
+    printf("C%d = {", i_conjunto);
+    if (c->tamanho > 0) {
+        if(c->tamanho > 1) {
+            for (int i = 0; i < (c->tamanho)-1; i++) {
+                printf("%d, ", p->valor_elemento);
+                p = p->prox;
+            }
+        }
+        printf("%d}\n", p->valor_elemento);
+    } else {
+        printf("}\n");
+    }
+
+}
+
 void limpar_vetor(conjunto vetor_conjuntos[]) {
     for (int i = 0; i < 128; i++) {
-        conjunto c = vetor_conjuntos[i];
-        while(c.head != NULL) {
-            no_elemento* p = c.head;
-            c.head = c.head->prox;
-            free(p);
-        }
+        conjunto* c = &vetor_conjuntos[i];
+        inicializar_conjunto(c);
     }
-    free(vetor_conjuntos);
 }
 
 int main() {
@@ -158,7 +198,7 @@ int main() {
     int n_elementos;
     int valor_elemento;
 
-    conjunto* vetor_conjuntos = malloc(128 * sizeof(conjunto));
+    conjunto vetor_conjuntos[128];
 
     for (int i = 0; i < 128; i++) {
         vetor_conjuntos[i].tamanho = 0;
@@ -186,6 +226,7 @@ int main() {
 
                 for (int i = 0; i < n_elementos; i++) {
                     scanf(" %d", &valor_elemento);
+
                     remover_elemento(&vetor_conjuntos[i_conjunto], valor_elemento);
                 }
                 break;
@@ -219,6 +260,11 @@ int main() {
                 } else {
                     printf("%d nao esta em C%d\n", valor_elemento, i_conjunto);
                 }
+                break;
+            case 'p':
+                scanf(" %d", &i_conjunto);
+
+                imprimir_elementos(&vetor_conjuntos[i_conjunto], i_conjunto);
                 break;
             case 't':
                 limpar_vetor(vetor_conjuntos);
