@@ -154,9 +154,7 @@ void limpar_vetor(conjunto vetor_conjuntos[]) {
 
 int main() {
     char comando;
-    int i_conjunto;
-    int j_conjunto;
-    int k_conjunto;
+    int i_conjunto, j_conjunto, k_conjunto;
     int n_elementos;
     int valor_elemento;
 
