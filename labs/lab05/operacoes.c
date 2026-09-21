@@ -98,17 +98,93 @@ void remover_elemento(conjunto* c, int valor_elemento_rem) {
 
 void conjunto_uniao(conjunto* c_i, conjunto* c_j, conjunto* c_k) {
     conjunto temp = {0, NULL};
+    no_elemento* tail = NULL;
 
-    no_elemento* p = c_j->head;
-    while (p != NULL) {
-        adicionar_elemento(&temp, p->valor_elemento);
-        p = p->prox;
+    no_elemento* p_j = c_j->head;
+    no_elemento* p_k = c_k->head;
+
+    while (p_j != NULL && p_k != NULL) {
+        if(p_j->valor_elemento < p_k->valor_elemento) {
+            no_elemento* novo_elemento = malloc(sizeof(no_elemento));
+            if (novo_elemento != NULL) {
+                novo_elemento->valor_elemento = p_j->valor_elemento;
+                novo_elemento->prox = NULL;
+            
+                if (temp.head == NULL) {
+                    temp.head = novo_elemento;
+                } else {
+                    tail->prox = novo_elemento;
+                }
+                tail = novo_elemento;
+                temp.tamanho++;
+            }
+            p_j = p_j->prox;
+        }
+        else if (p_j->valor_elemento > p_k->valor_elemento) {
+            no_elemento* novo_elemento = malloc(sizeof(no_elemento));
+            if (novo_elemento != NULL) {
+                novo_elemento->valor_elemento = p_k->valor_elemento;
+                novo_elemento->prox = NULL;
+
+                if (temp.head == NULL) {
+                    temp.head = novo_elemento;
+                } else {
+                    tail->prox = novo_elemento;
+                }
+                tail = novo_elemento;
+                temp.tamanho++;
+            }
+
+            p_k = p_k->prox;
+        }
+        else {
+            no_elemento* novo_elemento = malloc(sizeof(no_elemento));
+            if (novo_elemento != NULL) {
+                novo_elemento->valor_elemento = p_j->valor_elemento;
+                novo_elemento->prox = NULL;
+
+                if (temp.head == NULL) {
+                    temp.head = novo_elemento;
+                } else {
+                    tail->prox = novo_elemento;
+                }
+                tail = novo_elemento;
+                temp.tamanho++;
+            }
+            p_j = p_j->prox;
+            p_k = p_k->prox;
+        }
+        
+    }
+    
+    while (p_k != NULL) {
+        no_elemento* novo_elemento = malloc(sizeof(no_elemento));
+        if (novo_elemento != NULL) {
+            novo_elemento->valor_elemento = p_k->valor_elemento;
+            novo_elemento->prox = NULL;
+
+            if (temp.head == NULL) temp.head = novo_elemento;
+            else tail->prox = novo_elemento;
+            
+            tail = novo_elemento;
+            temp.tamanho++;
+        }
+        p_k = p_k->prox;
     }
 
-    p = c_k->head;
-    while (p != NULL) {
-        adicionar_elemento(&temp, p->valor_elemento);
-        p = p->prox;
+    while (p_j != NULL) {
+        no_elemento* novo_elemento = malloc(sizeof(no_elemento));
+        if (novo_elemento != NULL) {
+            novo_elemento->valor_elemento = p_j->valor_elemento;
+            novo_elemento->prox = NULL;
+
+            if (temp.head == NULL) temp.head = novo_elemento;
+            else tail->prox = novo_elemento;
+            
+            tail = novo_elemento;
+            temp.tamanho++;
+        }
+        p_j = p_j->prox;
     }
 
     inicializar_conjunto(c_i);
@@ -129,13 +205,50 @@ bool buscar_elemento(conjunto* c, int valor_buscado) {
 
 void conjunto_diferenca(conjunto*c_i, conjunto* c_j, conjunto* c_k) {
     conjunto temp = {0, NULL};
+    no_elemento* tail = NULL;
 
-    no_elemento* p = c_j->head;
-    while (p != NULL) {
-        if (!buscar_elemento(c_k, p->valor_elemento)) {
-            adicionar_elemento(&temp, p->valor_elemento);
+    no_elemento* p_j = c_j->head;
+    no_elemento* p_k = c_k->head;
+
+    while (p_j != NULL && p_k != NULL) {
+        if(p_j->valor_elemento < p_k->valor_elemento) {
+            no_elemento* novo_elemento = malloc(sizeof(no_elemento));
+            if (novo_elemento != NULL) {
+                novo_elemento->valor_elemento = p_j->valor_elemento;
+                novo_elemento->prox = NULL;
+            
+                if (temp.head == NULL) {
+                    temp.head = novo_elemento;
+                } else {
+                    tail->prox = novo_elemento;
+                }
+                tail = novo_elemento;
+                temp.tamanho++;
+            }
+            p_j = p_j->prox;
         }
-        p = p->prox;
+        else if (p_j->valor_elemento > p_k->valor_elemento) {
+            p_k = p_k->prox;
+        }
+        else {
+            p_j = p_j->prox;
+            p_k = p_k->prox;
+        }
+    }
+
+    while (p_j != NULL) {
+        no_elemento* novo_elemento = malloc(sizeof(no_elemento));
+        if (novo_elemento != NULL) {
+            novo_elemento->valor_elemento = p_j->valor_elemento;
+            novo_elemento->prox = NULL;
+
+            if (temp.head == NULL) temp.head = novo_elemento;
+            else tail->prox = novo_elemento;
+            
+            tail = novo_elemento;
+            temp.tamanho++;
+        }
+        p_j = p_j->prox;
     }
 
     inicializar_conjunto(c_i);
@@ -145,13 +258,35 @@ void conjunto_diferenca(conjunto*c_i, conjunto* c_j, conjunto* c_k) {
 
 void conjunto_intersecao(conjunto* c_i, conjunto* c_j, conjunto* c_k) {
     conjunto temp = {0, NULL};
+    no_elemento* tail = NULL;
 
-    no_elemento* p = c_j->head;
-    while (p != NULL) {
-        if (buscar_elemento(c_k, p->valor_elemento)) {
-            adicionar_elemento(&temp, p->valor_elemento);
+    no_elemento* p_j = c_j->head;
+    no_elemento* p_k = c_k->head;
+
+    while (p_j != NULL && p_k != NULL) {
+        if(p_j->valor_elemento < p_k->valor_elemento) {
+            p_j = p_j->prox;
         }
-        p = p->prox;
+        else if (p_j->valor_elemento > p_k->valor_elemento) {
+            p_k = p_k->prox;
+        }
+        else {
+            no_elemento* novo_elemento = malloc(sizeof(no_elemento));
+            if (novo_elemento != NULL) {
+                novo_elemento->valor_elemento = p_j->valor_elemento;
+                novo_elemento->prox = NULL;
+            }
+            if (temp.head == NULL) {
+                temp.head = novo_elemento;
+            } else {
+                tail->prox = novo_elemento;
+            }
+            tail = novo_elemento;
+            temp.tamanho++;
+            p_j = p_j->prox;
+            p_k = p_k->prox;
+        }
+        
     }
 
     inicializar_conjunto(c_i);
