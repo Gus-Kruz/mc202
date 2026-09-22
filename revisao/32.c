@@ -36,15 +36,40 @@ void movenexttofront(no** cabeca, no* t) {
 
 void remover_menor(no** cabeca) {
     no** p = cabeca;
-    no* end_menor = *p;
-    no* anterior;
+    no** menor_p = p;
     int menor = (*p)->valor;
-    while((*p)->prox != NULL) {
-        if((*p)->prox->valor < menor) {
+    while((*p) != NULL) {
+        if((*p)->valor < menor) {
             menor = (*p)->valor;
-            end_menor = *p;
+            menor_p = p;
         }
         p = &((*p)->prox);
     }
+    no* aux = *menor_p;
+    *menor_p = (*menor_p)->prox;
+    free(aux);
+}
 
+no* copiar_lista(no* cabeca_orig) {
+    if (cabeca_orig == NULL) {
+        return NULL;
+    }
+    no* cabeca_copia = malloc(sizeof(no));
+    cabeca_copia->valor = cabeca_orig->valor;
+    cabeca_copia->prox = NULL;
+
+    no* atual_orig = cabeca_orig->prox;
+    no* atual_copia = cabeca_copia;
+
+    while(atual_orig != NULL) {
+        atual_copia->prox = malloc(sizeof(no));
+        atual_copia = atual_copia->prox;
+
+        atual_copia->valor = atual_orig->valor;
+        atual_copia->prox = NULL;
+
+        atual_orig = atual_orig->prox;
+    }
+
+    return cabeca_copia;
 }
