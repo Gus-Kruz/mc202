@@ -67,14 +67,15 @@ long df_size(dequef* D) {
 **/
 int df_push(dequef* D, float x) {
    if (D->size == D->cap) {
-      long new_cap = (long)(D->cap * D->factor);
+      // cria um novo vetor com a capacidade aumentada e copia a deque no inicio
+      long new_cap = (D->cap * D->factor);
       float* new_data = malloc(new_cap * sizeof(float));
       
       if (new_data == NULL) {
          return 0;
       }
       for (long i = 0; i < D->size; i++) {
-            new_data[i] = D->data[(D->first + i) % D->cap];
+            new_data[i] = D->data[(D->first + i) % D->cap]; 
       }
 
       free(D->data);
@@ -109,10 +110,10 @@ float df_pop(dequef* D) {
    D->size--;
    float popado = D->data[(D->first + D->size) % D->cap];
 
-   long limit = (long)(D->cap / (D->factor * D->factor));
+   long limit = (D->cap / (D->factor * D->factor));
    if (D->size <= limit && D->cap > D->mincap) {
    
-      long new_cap = (long)(D->cap / D->factor);
+      long new_cap = (D->cap / D->factor);
       if (new_cap < D->mincap) {
          new_cap = D->mincap;
       }
@@ -194,12 +195,11 @@ int df_inject(dequef* D, float x) {
 **/
 float df_eject(dequef* D) {
    float ejectado = D->data[D->first];
-   
 
    D->first = (D->first + 1) % D->cap;
    D->size--;
 
-   long limit = (long)(D->cap / (D->factor * D->factor));
+   long limit = (D->cap / (D->factor * D->factor));
    if (D->size <= limit && D->cap > D->mincap) {
       long new_cap = (long)(D->cap / D->factor);
       if (new_cap < D->mincap) {
@@ -211,7 +211,7 @@ float df_eject(dequef* D) {
          for (long i = 0; i < D->size; i++) {
             e_data[i] = D->data[(D->first + i) % D->cap];
          }
-            
+
          free(D->data);
          D->data = e_data;
          D->first = 0;

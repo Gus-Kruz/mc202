@@ -60,7 +60,7 @@ no* copiar_lista(no* cabeca_orig) {
 
     no* atual_orig = cabeca_orig->prox;
     no* atual_copia = cabeca_copia;
-
+h
     while(atual_orig != NULL) {
         atual_copia->prox = malloc(sizeof(no));
         atual_copia = atual_copia->prox;
