@@ -1,21 +1,13 @@
-#include <ctype.h>
 #include <stdio.h>
-#include<stdlib.h>
+#include <stdlib.h>
 #include <string.h>
 
 typedef struct node {
-    char* word;
+    char word[101];
     long long f;
     struct node* left;
     struct node* right;
 } node;
-
-typedef struct din_word {
-    char* word;
-    long long size;
-    long long cap;
-    int factor;
-} din_word;
 
 typedef struct din_vec_node {
     node** vec_node;
@@ -23,27 +15,6 @@ typedef struct din_vec_node {
     long long cap;
     int factor;
 } din_vec_node;
-
-din_word* alloc_W(){
-    din_word* W = malloc(sizeof(din_word));
-    W->size = 0;
-    W->cap = 128;
-    W->factor = 2;
-    W->word = malloc(W->cap * sizeof(char));
-
-    return W;
-}
-
-void resize_W(din_word* W) {
-    W->cap *= W->factor;
-    din_word* RW = realloc(W, W->cap);
-    W = RW;
-}
-
-void free_W(din_word* W) {
-    free(W->word);
-    free(W);
-}
 
 din_vec_node* alloc_N() {
     din_vec_node* N = malloc(sizeof(din_vec_node));
@@ -97,24 +68,6 @@ node* alloc_node() {
     return new_node;
 }
 
-void read_word(din_word* W) {
-    char curr_char;
-
-    scanf(" %c", &curr_char);
-    W->word[W->size++] = curr_char;
-    
-    while ((curr_char = getchar()) != EOF) {
-        if (isspace(curr_char) || curr_char == '\n' || curr_char == '\0' ) {
-            break;
-        }
-        if (W->size == W->cap) {
-            resize_W(W);
-        }
-        W->word[W->size++] = curr_char;
-    }
-    W->word[W->size++] = '\0';
-}
-
 void insert_word2(node** p_root, node* new_node) {
     if (*p_root == NULL) {
         *p_root = new_node;
@@ -150,7 +103,7 @@ node* search_word(node* root, char* word) {
     }
 }
 
-void autocomplete(node* root, din_vec_node* N, char* prefix, long long size_prefix) {
+void autocomplete(node* root, din_vec_node* N, char prefix[], long long size_prefix) {
     if (root == NULL) {
         return;
     }
@@ -214,7 +167,7 @@ void delete_word2(node** p_root, char word[]) {
         }
         // caso 2: nó tem 2 filhos, troco as informações do root com o sucessor e apago o sucessor
         node* succ = get_small_succ((*p_root));
-        (*p_root)->word = succ->word;
+        strcpy((*p_root)->word, succ->word);
         (*p_root)->f = succ->f;
 
         delete_word2(&((*p_root)->right), succ->word);
@@ -247,15 +200,9 @@ int main() {
 
     while (scanf(" %s", command) == 1) {
         if (strcmp(command, "INSERT") == 0) {
-            din_word* W = alloc_W();
             node* new_node = alloc_node();
 
-            read_word(W);
-
-            new_node->word = malloc(W->size* sizeof(char));
-            strcpy(new_node->word, W->word);
-
-            free_W(W);
+            scanf(" %s", new_node->word);
 
             scanf(" %lld", &f);
             new_node->f = f;
@@ -264,18 +211,10 @@ int main() {
         }
 
         else if (strcmp(command, "SEARCH") == 0) {
-            din_word* W = alloc_W();
-
-            read_word(W);
-
-            char* word = malloc(W->size * sizeof(char));
-            strcpy(word, W->word);
-
-            free_W(W);
+            char word[101];
+            scanf(" %s", word);
 
             node* found_node = search_word(root, word);
-
-            free(word);
 
             if (found_node == NULL) {
                 printf("%s not found.\n", word);
@@ -285,16 +224,10 @@ int main() {
         }
 
         else if (strcmp(command, "AUTOCOMPLETE") == 0) {
-            din_word* W = alloc_W();
-            
-            read_word(W);
+            char prefix[101];
+            scanf(" %s", prefix);
 
-            char* prefix = malloc(W->size * sizeof(char));
-            strcpy(prefix, W->word);
-
-            long long size_prefix = W->size - 1;
-
-            free_W(W);
+            int size_prefix = strlen(prefix);
             
             din_vec_node* N = alloc_N();
 
@@ -315,22 +248,14 @@ int main() {
             printf("\n");
 
             free_N(N);
-            free(prefix);
         }
 
         else if (strcmp(command, "DELETE") == 0) {
-            din_word* W = alloc_W();
-
-            read_word(W);
-
-            char* word = malloc(W->size * sizeof(char));
-            strcpy(word, W->word);
-
-            free_W(W);
+            char word[101];
+            scanf(" %s", word);
 
             delete_word2(&root, word);
 
-            free(word);
         }
         else if (strcmp(command, "PRINT") == 0) {
             din_vec_node* N = alloc_N();
@@ -358,7 +283,7 @@ int main() {
             tree_to_vec(root, N);
 
             for (int i = 0; i < N->size; i++) {
-                free(N->vec_node[i]);
+                //free(N->vec_node[i]);
             }
 
             free_N(N);
