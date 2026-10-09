@@ -3,16 +3,16 @@
 #include <string.h>
 
 typedef struct node {
-    char word[101];
-    long long f;
+    char word[30];
+    long f;
     struct node* left;
     struct node* right;
 } node;
 
 typedef struct din_vec_node {
     node** vec_node;
-    long long size;
-    long long cap;
+    long size;
+    long  cap;
     int factor;
 } din_vec_node;
 
@@ -28,7 +28,7 @@ din_vec_node* alloc_N() {
 
 void resize_N(din_vec_node* N) {
     N->cap *= N->factor;
-    node** r_vec_node = realloc(N->vec_node, N->cap);
+    node** r_vec_node = realloc(N->vec_node, N->cap * sizeof(node*));
     N->vec_node = r_vec_node;
 }
 
@@ -37,26 +37,30 @@ void free_N(din_vec_node* N) {
     free(N);
 }
 
-int compare_vec_node(const void* n1, const void* n2) {
-    int x = ((node*) n1)->f;
-    int y = ((node*) n2)->f;
+int compare_f(const void* n1, const void* n2) {
+    node* x = *((node**) n1);
+    node* y = *((node**) n2);
 
-    char* w1 = ((node*) n1)->word;
-    char* w2 = ((node*) n2)->word;
-    if (x > y) {
+    int cmp = strcmp(x->word, y->word);
+
+    if (x->f < y->f) {
         return 1;
     }
-    else if (x == y) {
-        if (strcmp(w1, w2) > 0) {
-            return 1;
-        }
-        else {
-            return -1;
-        }
-    }
-    else {
+    else if (x->f > y->f) {
         return -1;
     }
+    else {
+        return cmp;
+    }
+}
+
+int compare_l(const void* n1, const void* n2) {
+    node* x = *((node**) n1);
+    node* y = *((node**) n2);
+
+    int cmp = strcmp(x->word, y->word);
+
+    return cmp;
 }
 
 node* alloc_node() {
@@ -71,18 +75,20 @@ node* alloc_node() {
 void insert_word2(node** p_root, node* new_node) {
     if (*p_root == NULL) {
         *p_root = new_node;
+        return;
     }
     else {
-        long long cmp = strcmp((*p_root)->word, new_node->word);
-        if (cmp > 0) {
-            insert_word2(&((*p_root)->left), new_node);
-        }
-        else if (cmp == 0) {
+        int cmp = strcmp((*p_root)->word, new_node->word);
+        if (cmp == 0) {
             (*p_root)->f = new_node->f;
             free(new_node);
+            return;
         }
-        else if (cmp < 0) {
+        else if (cmp > 0) {
             insert_word2(&((*p_root)->left), new_node);
+        }
+        else {
+            insert_word2(&((*p_root)->right), new_node);
         }
     }
 }
@@ -93,23 +99,39 @@ node* search_word(node* root, char* word) {
     }
     int cmp = strcmp(root->word, word);
     if (cmp > 0) {
-        return search_word(root->right, word);
+        return search_word(root->left, word);
     }
     else if (cmp < 0) {
-        return search_word(root->left, word);
+        return search_word(root->right, word);
     }
     else {
         return root;
     }
 }
 
-void autocomplete(node* root, din_vec_node* N, char prefix[], long long size_prefix) {
+void tree_to_vec(node* root, din_vec_node* N) {
+    if (root == NULL) {
+        return;
+    }
+    if (root->left != NULL) {
+        tree_to_vec(root->left, N);
+    }
+    if (root->right != NULL) {
+        tree_to_vec(root->right, N);
+    }
+    if(N->size == N->cap) {
+            resize_N(N);
+        }
+    N->vec_node[N->size++] = root;
+    
+}
+
+void autocomplete(node* root, din_vec_node* N, char prefix[], int size_prefix) {
     if (root == NULL) {
         return;
     }
 
     int cmp = strncmp(root->word, prefix, size_prefix);
-
     if (cmp == 0) {
         if(N->size == N->cap) {
             resize_N(N);
@@ -118,12 +140,20 @@ void autocomplete(node* root, din_vec_node* N, char prefix[], long long size_pre
         autocomplete(root->right, N, prefix, size_prefix);
         autocomplete(root->left, N, prefix, size_prefix);
     }
-    else if (cmp < 0) {
-        autocomplete(root->right, N, prefix, size_prefix);
+    else if (cmp > 0) {
+        autocomplete(root->left, N, prefix, size_prefix);
     }
     else {
-        autocomplete(root->left, N, prefix, size_prefix);
+        autocomplete(root->right, N, prefix, size_prefix);
     } 
+}
+
+void print_in_order(node* root) {
+    if (root != NULL) {
+        print_in_order(root->left);
+        printf("%s ",root->word);
+        print_in_order(root->right);
+    }
 }
 
 node* get_small_succ(node* root) {
@@ -174,27 +204,20 @@ void delete_word2(node** p_root, char word[]) {
     }
 }
 
-void tree_to_vec(node* root, din_vec_node* N) {
-    if (root == NULL) {
-        return;
+void free_post_order(node* root) {
+    if (root != NULL) {
+        free_post_order(root->left);
+        free_post_order(root->right);
+        free(root);
     }
-    if (root->left != NULL) {
-        tree_to_vec(root->left, N);
-    }
-    if (root->right != NULL) {
-        tree_to_vec(root->right, N);
-    }
-    if(N->size == N->cap) {
-            resize_N(N);
-        }
-    N->vec_node[N->size++] = root;
-    
 }
 
 int main() {
     char command[13];
-    long long f;
-    long long k;
+    long f;
+    long k;
+
+    din_vec_node* N = alloc_N();
 
     node* root = NULL;
 
@@ -204,14 +227,14 @@ int main() {
 
             scanf(" %s", new_node->word);
 
-            scanf(" %lld", &f);
+            scanf(" %ld", &f);
             new_node->f = f;
 
             insert_word2(&root, new_node);
         }
 
         else if (strcmp(command, "SEARCH") == 0) {
-            char word[101];
+            char word[30];
             scanf(" %s", word);
 
             node* found_node = search_word(root, word);
@@ -219,75 +242,57 @@ int main() {
             if (found_node == NULL) {
                 printf("%s not found.\n", word);
             } else {
-                printf("%s %lld\n", word, found_node->f);
+                printf("%s %ld\n", word, found_node->f);
             }
         }
 
         else if (strcmp(command, "AUTOCOMPLETE") == 0) {
-            char prefix[101];
+            char prefix[30];
             scanf(" %s", prefix);
 
             int size_prefix = strlen(prefix);
-            
-            din_vec_node* N = alloc_N();
 
-            scanf(" %lld", &k);
+            scanf(" %ld", &k);
 
-            autocomplete(root, N, prefix, size_prefix);
+            autocomplete(root , N, prefix, size_prefix);
 
-            qsort(N->vec_node, N->size, sizeof(node), compare_vec_node);
+            qsort(N->vec_node, N->size, sizeof(node*), compare_f);
 
             if (N->size == 0) {
                 printf("nothing for %s.", prefix);
             }
             else {
                 for (int i = 0; i < k && i < N->size; i++) {
-                    printf("(%s,%lld) ", N->vec_node[i]->word, (N->vec_node[i]->f));
+                    printf("(%s,%ld) ", N->vec_node[i]->word, (N->vec_node[i]->f));
                 }
             }
             printf("\n");
 
-            free_N(N);
+            N->size = 0;
         }
 
         else if (strcmp(command, "DELETE") == 0) {
-            char word[101];
+            char word[30];
             scanf(" %s", word);
 
             delete_word2(&root, word);
 
         }
         else if (strcmp(command, "PRINT") == 0) {
-            din_vec_node* N = alloc_N();
 
-            tree_to_vec(root, N);
-
-            qsort(N->vec_node, N->size, sizeof(node*), compare_vec_node);
-
-            if (N->size == 0) {
-                printf("the dictionary is empty");
+            if (root == NULL) {
+                printf("the dictionary is empty.");
             }
             else {
-                for (int i = 0; i < N->size; i++) {
-                    printf("%s ", N->vec_node[i]->word);
-                }
+                print_in_order(root);
             }
 
             printf("\n");
-
-            free_N(N);
         }
         else if (strcmp(command, "EXIT") == 0) {
-            din_vec_node* N = alloc_N();
 
-            tree_to_vec(root, N);
-
-            for (int i = 0; i < N->size; i++) {
-                //free(N->vec_node[i]);
-            }
-
+            free_post_order(root);
             free_N(N);
-            return 0;
         }
     }
 }
