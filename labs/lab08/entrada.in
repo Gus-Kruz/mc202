@@ -1,0 +1,10 @@
+l
+i 20 interno obsoleto
+i 10 publico atualizado
+i 30 restrito desatualizado
+l
+b 40
+b 10
+a 30 restrito atualizado
+t
+f
