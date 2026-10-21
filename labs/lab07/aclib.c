@@ -56,7 +56,6 @@ int compare_f(const void* n1, const void* n2)
 {
   Node* x = *((Node**) n1);
   Node* y = *((Node**) n2);
-
   int cmp = strcmp(x->word, y->word);
 
   if (x->f < y->f)
