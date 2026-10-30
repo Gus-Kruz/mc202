@@ -6,8 +6,8 @@ typedef struct Node // ok
 {
     long id;
     long height;
-    char vis[10];
-    char sts[14];
+    char vis[20];
+    char sts[20];
     struct Node* parent;
     struct Node* left;
     struct Node* right;
