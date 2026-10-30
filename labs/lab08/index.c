@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct Node
+typedef struct Node // ok
 {
     long id;
     long height;
@@ -14,22 +14,22 @@ typedef struct Node
 
 } Node;
 
-Node* alloc_node()
+Node* alloc_node() // ok
 {
     Node* new_node = malloc(sizeof(Node));
     new_node->parent = NULL;
     new_node->left = NULL;
     new_node->right = NULL;
-    new_node->height = 0;
+    new_node->height = 1;
 
     return new_node;
 }
 
-int max(int a, int b) {
+int max(int a, int b) { // ok
     return (a > b) ? a : b;
 }
 
-void update_height(Node* root)
+void update_height(Node* root) // ok
 {
     if (root != NULL)
     {
@@ -49,7 +49,7 @@ void update_height(Node* root)
     }
 }
 
-void RRR(Node** root)
+void RRR(Node** root) // ok
 {
     Node* aux = (*root)->right;
 
@@ -73,7 +73,7 @@ void RRR(Node** root)
             aux->parent->right = aux;
     }
 
-    *root = aux;
+    *root = aux; // supostamente funcional
 
     update_height((*root)->left);
     update_height((*root)->right);
@@ -81,7 +81,7 @@ void RRR(Node** root)
     update_height((*root)->parent);
 }
 
-void LLR(Node** root)
+void LLR(Node** root) // ok
 {
     Node* aux = (*root)->left;
 
@@ -93,6 +93,8 @@ void LLR(Node** root)
     }
 
     aux->right = *root;
+    
+    aux->parent = (*root)->parent;
 
     (*root)->parent = aux;
 
@@ -107,7 +109,7 @@ void LLR(Node** root)
         }
     }
 
-    *root = aux;
+    *root = aux; // supostamente funcional
 
     update_height((*root)->left);
     update_height((*root)->right);
@@ -115,16 +117,16 @@ void LLR(Node** root)
     update_height((*root)->parent);
 }
 
-void LRR(Node** root)
+void LRR(Node** root) // ok
 {
     RRR(&((*root)->left));
-    LLR(root);
+    LLR(&((*root)->parent));
 }
 
-void RLR(Node** root)
+void RLR(Node** root) // ok
 {
     LLR(&((*root)->right));
-    RRR(root);
+    RRR(&((*root)->parent));
 }
 
 void insert_node(Node** root, Node* new_node) 
