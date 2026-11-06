@@ -10,26 +10,23 @@ int main()
     Node* root = NULL;
 
     long x;
-    long cntr_files[3] = {0};
-    char nivel[20];
-    char sts[20];
-
-    Node* new_node;
+    int cntr_files[3] = {0};
+    char nivel[10];
+    char sts[14];
 
     while (scanf(" %c", &comando) == 1)
     {
         switch (comando)
         {
             case 'i':
-                new_node = alloc_node();  
-                scanf(" %ld %s %s", &(new_node->id), new_node->vis, new_node->sts);
-                
-                insert_node(&root, new_node);
+                scanf(" %ld %9s %13s", &x, nivel, sts);
+
+                insert_node(&root, x, vis_codigo(nivel), sts_codigo(sts));
 
                 break;
             case 'a':
                 scanf(" %ld %s %s", &x, nivel, sts);
-                update_node(root, x, nivel, sts);
+                update_node(root, x, vis_codigo(nivel), sts_codigo(sts));
 
                 break;
             case 'b':
@@ -40,7 +37,7 @@ int main()
                 }
                 else
                 {
-                    printf("%ld, %s, %s\n", x, found_node->vis, found_node->sts);
+                    printf("%ld, %s, %s\n", x, vis_nome(found_node->vis), sts_nome(found_node->sts));
                 }
 
                 break;
@@ -64,7 +61,7 @@ int main()
                 }
 
                 store_n(root, cntr_files);
-                printf("atualizado: %ld, desatualizado: %ld, obsoleto: %ld\n", cntr_files[0], cntr_files[1], cntr_files[2]);
+                printf("atualizado: %d, desatualizado: %d, obsoleto: %d\n", cntr_files[0], cntr_files[1], cntr_files[2]);
 
                 break;
             case 'f':
@@ -73,4 +70,7 @@ int main()
                 return 0;
         }
     }
+    free_tree(root);
+
+    return 0;
 }

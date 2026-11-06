@@ -3,12 +3,48 @@
 #include <string.h>
 #include "avlib.h"
 
-Node* alloc_node(long id, const char* vis, const char* sts)
+unsigned char vis_codigo(const char nome[])
+{
+    if (strcmp(nome, "restrito") == 0) return VIS_RESTRITO;
+    if (strcmp(nome, "interno") == 0)  return VIS_INTERNO;
+    if (strcmp(nome, "publico") == 0)  return VIS_PUBLICO;
+    return VIS_BLOQUEADO;
+}
+
+const char* vis_nome(unsigned char vis)
+{
+    switch (vis)
+    {
+        case VIS_RESTRITO: return "restrito";
+        case VIS_INTERNO:  return "interno";
+        case VIS_PUBLICO:  return "publico";
+        default:           return "bloqueado";
+    }
+}
+
+unsigned char sts_codigo(const char nome[])
+{
+    if (strcmp(nome, "atualizado") == 0)    return EST_ATUALIZADO;
+    if (strcmp(nome, "desatualizado") == 0) return EST_DESATUALIZADO;
+    return EST_OBSOLETO;
+}
+
+const char* sts_nome(unsigned char sts)
+{
+    switch (sts)
+    {
+        case EST_ATUALIZADO:    return "atualizado";
+        case EST_DESATUALIZADO: return "desatualizado";
+        default:                return "obsoleto";
+    }
+}
+
+Node* alloc_node(long id, unsigned char vis, unsigned char sts)
 {
     Node* new_node = malloc(sizeof(Node));
     new_node->id = id;
-    strcpy(new_node->vis, vis);
-    strcpy(new_node->sts, sts);
+    new_node->vis = vis;
+    new_node->sts = sts;
     new_node->left = NULL;
     new_node->right = NULL;
     new_node->height = 1;
@@ -46,12 +82,8 @@ void RRR(Node** root)
     Node* aux = old_root->right;
 
     old_root->right = aux->left;
-    if (aux->left != NULL) 
-        aux->left->parent = old_root;
 
     aux->left = old_root;
-    aux->parent = old_root->parent;
-    old_root->parent = aux;
 
     *root = aux;
 
@@ -65,12 +97,8 @@ void LLR(Node** root)
     Node* aux = old_root->left;
 
     old_root->left = aux->right;
-    if (aux->right != NULL) 
-        aux->right->parent = old_root;
-
+    
     aux->right = old_root;
-    aux->parent = old_root->parent;
-    old_root->parent = aux;
 
     *root = aux;
 
@@ -90,75 +118,73 @@ void RLR(Node** root)
     RRR(root);
 }
 
-void insert_node(Node** root, Node* new_node) 
-{
-    if (*root == NULL)
-    {
-        *root = new_node;
-        return;
-    }
-    if (new_node->id == (*root)->id)
-    {
-        free(new_node);
-        return;
-    }
-
+int calc_fb(Node* root) {
     int left_h = 0;
     int right_h = 0;
 
-    if (new_node->id > (*root)->id)
-    {
-        insert_node(&((*root)->right), new_node);
-        (*root)->right->parent = *root;
+    if (root->left != NULL) {
+        left_h = root->left->height;
+    }
 
-        if ((*root)->left != NULL)
-        {
-            left_h = ((*root)->left->height);
-        }
-        if ((*root)->right != NULL)
-        {
-            right_h = ((*root)->right->height);
-        }
-        if (abs(left_h - right_h) == 2)
-        {
-            if ((*root)->right != NULL && new_node->id < (*root)->right->id)
-            {
-                RLR(root);
-            }
-            else 
-            {
-                RRR(root);
-            }
-        }
+    if (root->right != NULL) {
+        right_h = root->right->height;
+    }
+
+    return left_h - right_h;
+}
+
+void insert_node(Node** root, long id, unsigned char vis, unsigned char sts) 
+{
+    if (*root == NULL)
+    {
+        *root = alloc_node(id, vis, sts);
+        return;
+    }
+    if (id == (*root)->id)
+    {
+        return;
+    }
+
+    if (id > (*root)->id)
+    {
+        insert_node(&((*root)->right), id, vis, sts);
     }
 
     else
     {
-        insert_node(&((*root)->left), new_node);
-        (*root)->left->parent = *root;
-
-        if ((*root)->left != NULL)
-        {
-            left_h = ((*root)->left->height);
-        }
-        if ((*root)->right != NULL)
-        {
-            right_h = ((*root)->right->height);
-        }
-        if (abs(left_h - right_h) == 2)
-        {
-            if ((*root)->left != NULL && new_node->id < (*root)->left->id)
-            {
-                LLR(root);
-            }
-            else 
-            {
-                LRR(root);
-            }
-        }
+        insert_node(&((*root)->left), id, vis, sts);
     }
 
     update_height(*root);
+
+    int fb = calc_fb(*root);
+
+    if (fb == -2) 
+    {
+        int child_fb = calc_fb((*root)->right);
+
+        if (child_fb <= 0)
+        {
+            RRR(root);
+        }
+        else
+        {
+            RLR(root);
+        }
+    }
+
+    else if (fb == 2)
+    {
+        int child_fb = calc_fb((*root)->left);
+
+        if (child_fb >= 0) {
+            LLR(root);
+        }
+        else
+        {
+            LRR(root);
+        }
+    }
 
 }
 
@@ -175,17 +201,15 @@ Node* search_node(Node* root, long x)
         return root;
     }
 
-    else if (x > root->id)
+    if (x > root->id)
     {
         return search_node(root->right, x);
     }
-    else
-    {
-        return search_node(root->left, x);
-    }
+
+    return search_node(root->left, x);
 }
 
-void update_node(Node* root, long x, char nivel[], char sts[])
+void update_node(Node* root, long x, unsigned char vis, unsigned char sts)
 {
     Node* found_node = search_node(root, x);
     if (found_node == NULL)
@@ -194,8 +218,8 @@ void update_node(Node* root, long x, char nivel[], char sts[])
     }
     else
     {
-        strcpy(found_node->vis, nivel);
-        strcpy(found_node->sts, sts);
+        found_node->vis = vis;
+        found_node->sts = sts;
     }
 
 }
@@ -212,24 +236,13 @@ void print_inorder(Node* root)
     print_inorder(root->right);
 }
 
-void store_n(Node* root, long cntr_files[])
+void store_n(Node* root, int cntr_files[])
 {   
     if(root == NULL) {
         return;
     }
 
-    if (strcmp(root->sts, "atualizado") == 0)
-    {
-        cntr_files[0]++;
-    }
-    else if (strcmp(root->sts, "desatualizado") == 0)
-    {
-        cntr_files[1]++;
-    }
-    else if (strcmp(root->sts, "obsoleto") == 0)
-    {
-        cntr_files[2]++;
-    }
+    cntr_files[root->sts]++;
 
     store_n(root->left, cntr_files);
     store_n(root->right, cntr_files);
