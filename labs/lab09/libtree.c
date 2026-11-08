@@ -5,13 +5,36 @@ Bnode* alloc_bnode(int t, bool leaf)
     Bnode* new_node = (Bnode*) malloc(sizeof(Bnode));
 
     new_node->n = 0;
-    new_node->indexes = (Index*) malloc(t*sizeof(Index));
-    new_node->children = (Bnode**) malloc((t+1)*sizeof(Bnode*));
+    new_node->indexes = (Index*) malloc((2 * t - 1)*sizeof(Index));
+    new_node->children = (Bnode**) malloc((2 * t)*sizeof(Bnode*));
     new_node->leaf = leaf;
     
-    for (int i = 0; i<=t; i++)
+    for (int i = 0; i < 2 * t; i++)
     {
         new_node->children[i] = NULL;
+    }
+}
+
+Index* search_index(Bnode* root, int x)
+{
+    for (int i = 0; i < root->n; i++)
+    {
+        if (root->indexes[i].key >= x) {
+            if (x == root->indexes[i].key)
+            {
+                return &(root->indexes[i]);
+            }
+
+            if (root->leaf) {
+                return NULL;
+            }
+
+            search_index(root->children[i], x);
+        }
+
+        else if (root->leaf) {
+                return NULL;
+            }
     }
 }
 
@@ -20,7 +43,19 @@ void split_child(Bnode* parent, int pos, int t)
     Bnode* child = parent->children[pos];
     Bnode* new_node = alloc_bnode(t, child->leaf);
 
-    new_node->n = t/2\;
+    bool paridade;
+
+    if (t % 2 == 0)
+    {
+        paridade = true;
+    }
+
+    else
+    {
+        paridade = false;
+    }
+
+    new_node->n = (t+1)/2 - 1;
 
     for (int i = 0; i < t/2; i++)
     {

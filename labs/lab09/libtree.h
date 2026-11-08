@@ -17,4 +17,6 @@ typedef struct Bnode
 
 Bnode* alloc_bnode(int t, bool leaf);
 
+Bnode* search_index(Bnode* root, int x);
+
 void split_child(Bnode* parent, int index, int t);
